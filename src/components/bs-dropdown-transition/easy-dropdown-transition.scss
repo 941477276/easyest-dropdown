@@ -8,6 +8,7 @@
   @include zoom;
 
   &.easyest-placement-top,
+  &.easyest-placement-top-center,
   &.easyest-placement-top-end{
     margin-top: -.35rem;
     &.use-bottom-position{
@@ -18,6 +19,7 @@
     //@include slide-top;
   }
   &.easyest-placement-bottom,
+  &.easyest-placement-bottom-center,
   &.easyest-placement-bottom-end{
     margin-top: .35rem;
     transform-origin: 0% 0%;
