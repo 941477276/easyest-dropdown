@@ -703,6 +703,8 @@ export function getDropdownDirection (referenceEl: HTMLElement, targetEl: HTMLEl
             return true;
           }
           return false;
+        } else { // 中间方向则直接return掉（不return掉会导致下拉在滚动容器中不能完全展示时也使用中间方向）
+          return;
         }
       }
       calcedDirection = result;
