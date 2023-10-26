@@ -27,6 +27,13 @@ export interface DropdownDirection {
   isRollback?: boolean; // 是否为回滚到了默认方向
 };
 
+export interface VirtualMouseEvent {
+  clientX: number;
+  clientY: number;
+  target?: EventTarget|null;
+  contextElement?: HTMLElement; // 上下文元素
+}
+
 export const endReg = /(\w+)End$/;
 export const centerReg = /(\w+)Center$/;
 export const documentNodeNames = ['HTML', 'BODY'];

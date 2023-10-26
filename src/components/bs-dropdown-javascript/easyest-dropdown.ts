@@ -8,33 +8,25 @@ import {
   camelCase2KebabCase
 } from '../../utils/bs-util';
 import { getDropdownDirection } from '../bs-dropdown-transition/useDropdownDirection';
+import { getContextmenuDropdownDirection } from '../bs-dropdown-transition/useContextmenuDropdownDirection';
 import version from '../../../src/version';
 
-export interface DropdownOffset {
-  top?: number;
-  left?: number;
-  // bottom?: number;
-  // right?: number;
-}
+import type {
+  DropdownDirection,
+  DropdownOffset,
+  VirtualMouseEvent
+} from '../bs-dropdown-transition/dropdownDirectionHookCommon';
 
-export interface DropdownDirection {
-  bottom: null|number;
-  direction: string;
-  horizontal: boolean;
-  horizontalVisibleWidth: number;
-  left: number;
-  right: number|number;
-  scrollParentHorizontal: boolean;
-  scrollParentVertical: boolean;
-  top: number;
-  vertical: boolean;
-  verticalVisibleHeight: number;
-  isRollback?: boolean; // 是否为回滚到了默认方向
-};
+export type {
+  DropdownDirection,
+  DropdownOffset,
+  VirtualMouseEvent
+} from '../bs-dropdown-transition/dropdownDirectionHookCommon';
 
 export interface EasyestDropdown {
   version:string;
   getDropdownDirection: (referenceEl: HTMLElement, targetEl: HTMLElement, direction: string, tryAllDirection?: boolean, tryEndDirection?: boolean, dropdownOffset?: DropdownOffset) => DropdownDirection;
+  getContextmenuDirection: (virtualMouseEvt: VirtualMouseEvent, targetEl: HTMLElement, direction: string, tryAllDirection?: boolean, tryEndDirection?: boolean, dropdownOffset?: DropdownOffset) => DropdownDirection;
   eleIsInFixedParents: (ele: HTMLElement) => boolean;
   getScrollParent: (ele: HTMLElement) => HTMLElement|undefined;
   hasScroll: (ele?: HTMLElement) => { vertical: boolean; horizontal: boolean; };
@@ -48,6 +40,7 @@ function EasyDropdown () {
   this.version = version;
 };
 EasyDropdown.prototype.getDropdownDirection = getDropdownDirection;
+EasyDropdown.prototype.getContextmenuDirection = getContextmenuDropdownDirection;
 EasyDropdown.prototype.eleIsInFixedParents = eleIsInFixedParents;
 EasyDropdown.prototype.getScrollParent = getScrollParent;
 EasyDropdown.prototype.hasScroll = hasScroll;

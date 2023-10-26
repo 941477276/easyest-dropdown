@@ -17,6 +17,7 @@ import {
 import {
   DropdownOffset,
   DropdownDirection,
+  VirtualMouseEvent,
   endReg,
   centerReg,
   documentNodeNames,
@@ -43,14 +44,14 @@ export interface DropdownDirection {
   vertical: boolean;
   verticalVisibleHeight: number;
   isRollback?: boolean; // 是否为回滚到了默认方向
-}; */
+};
 
 export interface VirtualMouseEvent {
   clientX: number;
   clientY: number;
   target?: EventTarget|null;
   contextElement?: HTMLElement; // 上下文元素
-}
+} */
 
 /**
  * 计算右键菜单绝对定位元素能完全出现在视口的展示方位
@@ -64,7 +65,7 @@ export interface VirtualMouseEvent {
 /* const endReg = /(\w+)End$/;
 const centerReg = /(\w+)Center$/;
 const documentNodeNames = ['HTML', 'BODY']; */
-export function useContextmenuDropdownDirection (virtualMouseEvt: VirtualMouseEvent, targetEl: HTMLElement, direction: string, tryAllDirection = false, tryEndDirection = true, dropdownOffset?: DropdownOffset): DropdownDirection {
+export function getContextmenuDropdownDirection (virtualMouseEvt: VirtualMouseEvent, targetEl: HTMLElement, direction: string, tryAllDirection = false, tryEndDirection = true, dropdownOffset?: DropdownOffset): DropdownDirection {
   if (!virtualMouseEvt || !targetEl || !direction) {
     throw new Error('One of the parameters of virtualMouseEvt, targetEl, direction is missing!');
   }

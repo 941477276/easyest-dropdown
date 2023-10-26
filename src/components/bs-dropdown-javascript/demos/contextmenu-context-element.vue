@@ -3,11 +3,11 @@
 ---
 order: 0
 title:
-  zh-CN: 右键菜单
-  en-US: Context Menu
+  zh-CN: 右键菜单—上下文元素
+  en-US: Context Menu--context element
 description:
-  zh-CN: `easy-dropdown-transition`同样可以用来实现右键菜单功能，只需要设置`context-menu=true`即可
-  en-US: `easy-dropdown-transition` can also be used to implement the right-click menu function, just set `context-menu=true`
+  zh-CN: 设置`contextElement`参数后下拉菜单将以该元素为承载容器，下拉菜单的位置始终不会超出该元素
+  en-US: After setting the `contextElement` parameter, the drop-down menu will use this element as the hosting container, and the position of the drop-down menu will never exceed this element.
 ---
 </docs>
 
@@ -21,11 +21,12 @@ description:
         <bs-radio value="bottom-end">bottom-end</bs-radio>
       </bs-radio-group>
     </bs-form-item>
-    <div class="context-menu-demo" id="demoRef1">
+    <div class="context-menu-demo" id="demoRef2">
       <bs-button type="primary" @click="allowTeleport = !allowTeleport">Dropdown content teleport to body</bs-button>
+      <bs-button type="primary" @click="hideDropdown">Hide Dropdown</bs-button>
 
       <teleport :disabled="!allowTeleport" to="body">
-        <ul id="dropdownRef1" class="my-custom-dropdown">
+        <ul id="dropdownRef2" class="my-custom-dropdown">
           <li>Html</li>
           <li>Javascript</li>
           <li>Css</li>
@@ -39,21 +40,30 @@ description:
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useContextmenuDropdownDirection } from '../useContextmenuDropdownDirection';
-import '../easy-dropdown-transition.scss';
+import easyestDropdown from '../easyest-dropdown';
+import '../../bs-dropdown-transition/easy-dropdown-transition.scss';
 
 let isShow = false;
 let allowTeleport = ref(false);
 let placement = ref('top');
 
+const hideDropdown = function () {
+  let dropdownEl = document.getElementById('dropdownRef2');
+  if (dropdownEl) {
+    isShow = false;
+    dropdownEl.style.display = 'none';
+  }
+};
+
 onMounted(function () {
   document.documentElement.addEventListener('contextmenu', function (evt: MouseEvent) {
     evt.preventDefault();
-    let dropdownEl = document.getElementById('dropdownRef1')!;
+    let dropdownEl = document.getElementById('dropdownRef2')!;
 
-    let elPosition = useContextmenuDropdownDirection({
+    let elPosition = easyestDropdown.getContextmenuDirection({
       clientX: evt.clientX,
-      clientY: evt.clientY
+      clientY: evt.clientY,
+      contextElement: document.getElementById('demoRef2')!
     }, dropdownEl, placement.value, true);
     console.log('elPosition', elPosition);
 
