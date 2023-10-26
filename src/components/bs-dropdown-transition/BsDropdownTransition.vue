@@ -18,8 +18,8 @@
     ]"
     :style="{
       position: position,
-      ...(setWidth ? { width: dropdownStyle.width + 'px' } : {}),
-      ...(setMinWidth ? { minWidth: dropdownStyle.width + 'px' } : {}),
+      ...(setWidth && contextMenu ? { width: dropdownStyle.width + 'px' } : {}),
+      ...(setMinWidth && contextMenu ? { minWidth: dropdownStyle.width + 'px' } : {}),
       ...transitionOrigin,
       left: dropdownStyle.right == null ? (dropdownStyle.left + 'px') : 'auto',
       right: dropdownStyle.right != null ? (dropdownStyle.right + 'px') : '',
@@ -41,7 +41,7 @@ import {
   onMounted,
   onBeforeMount,
   ref,
-  watch
+  watch, computed
 } from 'vue';
 import { NOOP, isObject } from '@vue/shared';
 import {
@@ -53,6 +53,7 @@ import {
   camelCase2KebabCase
 } from '../../utils/bs-util';
 import { getDropdownDirection } from './useDropdownDirection';
+import { getContextmenuDropdownDirection } from './useContextmenuDropdownDirection';
 import { useGlobalEvent } from '../../hooks/useGlobalEvent';
 import { PlainObject } from '../types';
 import { bsDropdownTransitionProps, BsDropdownPositionInfo } from './bs-dropdown-transition-types';
@@ -97,18 +98,32 @@ export default defineComponent({
 
     // 刷新定位
     let refresh = function () {
-      let referenceRef = props.referenceRef;
+      let {
+        referenceRef,
+        contextMenu,
+        virtualMouseEvent
+      } = props;
+      let displayDirection: any;
       let referenceEl: HTMLElement|null = null;
-      if (referenceRef.nodeName) {
-        referenceEl = referenceRef;
-      } else if (isObject(referenceRef) && referenceRef.$el) {
-        referenceEl = referenceRef.$el;
-      }
-      if (!targetEl || !referenceEl) {
+      let referenceElRect: DOMRect|null = null;
+      if (!targetEl) {
         return;
       }
-      let referenceElRect = referenceEl.getBoundingClientRect();
-      let displayDirection: any = getDropdownDirection(referenceEl, targetEl, props.placement, props.tryAllPlacement, props.tryEndPlacement, props.offset);
+      if (!contextMenu) {
+        if (referenceRef.nodeName) {
+          referenceEl = referenceRef;
+        } else if (isObject(referenceRef) && referenceRef.$el) {
+          referenceEl = referenceRef.$el;
+        }
+        if (!referenceEl) {
+          return;
+        }
+        referenceElRect = referenceEl.getBoundingClientRect();
+        displayDirection = getDropdownDirection(referenceEl, targetEl, props.placement, props.tryAllPlacement, props.tryEndPlacement, props.offset);
+      } else {
+        displayDirection = getContextmenuDropdownDirection(virtualMouseEvent, targetEl, props.placement, props.tryAllPlacement, props.tryEndPlacement, props.offset);
+      }
+
       let bottom = displayDirection.bottom;
       let right = displayDirection.right;
       let direction = displayDirection.direction;
@@ -137,7 +152,9 @@ export default defineComponent({
       dropdownStyle.horizontalFullInview = displayDirection.horizontal;
       dropdownStyle.verticalFullInview = displayDirection.vertical;
       dropdownStyle.direction = direction;
-      dropdownStyle.width = referenceElRect.width;
+      if (!contextMenu) {
+        dropdownStyle.width = referenceElRect!.width;
+      }
       dropdownStyle.top = displayDirection.top;
       dropdownStyle.left = displayDirection.left;
       if (bottom === null) {
@@ -183,37 +200,60 @@ export default defineComponent({
       if (!isVisible) {
         return;
       }
-      let referenceRef = props.referenceRef;
+      let {
+        referenceRef,
+        virtualMouseEvent,
+        contextMenu
+      } = props;
       let referenceEl: HTMLElement|null = null;
-      if (!referenceRef) {
-        return;
-      }
-      if (referenceRef.nodeName) {
-        referenceEl = referenceRef;
-      } else if (isObject(referenceRef) && referenceRef.$el) {
-        referenceEl = referenceRef.$el;
-      }
-      let displayDirection: any = getDropdownDirection(referenceEl!, targetRef.value!, props.placement, props.tryAllPlacement);
 
+      let displayDirection: any;
+      if (!contextMenu) {
+        if (!referenceRef) {
+          return;
+        }
+        if (referenceRef.nodeName) {
+          referenceEl = referenceRef;
+        } else if (isObject(referenceRef) && referenceRef.$el) {
+          referenceEl = referenceRef.$el;
+        }
+        displayDirection = getDropdownDirection(referenceEl!, targetRef.value!, props.placement, props.tryAllPlacement);
+      } else {
+        console.log('virtualMouseEvent', virtualMouseEvent);
+        displayDirection = getContextmenuDropdownDirection(virtualMouseEvent, targetRef.value!, props.placement, props.tryAllPlacement);
+      }
       calcTransitionName(displayDirection);
     });
 
+    watch(() => props.virtualMouseEvent, function () {
+      if (!props.contextMenu) {
+        return;
+      }
+      refresh();
+    }, { deep: true });
+
     let onEnter = function (el:HTMLElement, done: () => void) {
-      let referenceRef = props.referenceRef;
+      let {
+        referenceRef,
+        virtualMouseEvent,
+        contextMenu
+      } = props;
       let referenceEl: HTMLElement|null = null;
-      if (!referenceRef) {
-        console.log('referenceRef不存在!-----------------------');
-        return;
-      }
-      if (referenceRef.nodeName) {
-        referenceEl = referenceRef;
-      } else if (isObject(referenceRef) && referenceRef.$el) {
-        referenceEl = referenceRef.$el;
-      }
-      // console.log('onEnter执行了', referenceEl?.nodeName, el);
-      if (!referenceEl) {
-        console.log('参照元素不存在!-----------------------');
-        return;
+      if (!contextMenu) {
+        if (!referenceRef) {
+          console.log('referenceRef不存在!-----------------------');
+          return;
+        }
+        if (referenceRef.nodeName) {
+          referenceEl = referenceRef;
+        } else if (isObject(referenceRef) && referenceRef.$el) {
+          referenceEl = referenceRef.$el;
+        }
+        // console.log('onEnter执行了', referenceEl?.nodeName, el);
+        if (!referenceEl) {
+          console.log('参照元素不存在!-----------------------');
+          return;
+        }
       }
       if (!el) {
         console.log('目标元素不存在!========================');
@@ -221,6 +261,7 @@ export default defineComponent({
       }
       isVisible.value = true;
       targetEl = el;
+      console.log('进入onEnter事件了,1111111111111');
       refresh();
 
       let onTransitionDone = function () {
@@ -233,13 +274,15 @@ export default defineComponent({
       el.addEventListener('transitioncancel', onTransitionDone, false);
       ctx.emit('enter', el, NOOP);
 
-      referenceScrollParent = getScrollParent(referenceEl);
-      let nodeName = referenceScrollParent?.nodeName || '';
+      if (!contextMenu) {
+        referenceScrollParent = getScrollParent(referenceEl!);
+        let nodeName = referenceScrollParent?.nodeName || '';
 
-      console.log('referenceScrollParent', referenceScrollParent);
-      // 如果参照元素有有滚动条的父级节点且不为body，则给该父级节点绑定scroll事件，在容器滚动的时候刷新下拉位置
-      if (referenceScrollParent && !documentNodeNames.includes(nodeName)) {
-        referenceScrollParent.addEventListener('scroll', scrollEvent, false);
+        console.log('referenceScrollParent', referenceScrollParent);
+        // 如果参照元素有有滚动条的父级节点且不为body，则给该父级节点绑定scroll事件，在容器滚动的时候刷新下拉位置
+        if (referenceScrollParent && !documentNodeNames.includes(nodeName)) {
+          referenceScrollParent.addEventListener('scroll', scrollEvent, false);
+        }
       }
       useGlobalEvent.addEvent('window', 'scroll', scrollEvent);
       useGlobalEvent.addEvent('window', resizeEventName, resizeEvent);
@@ -302,7 +345,6 @@ export default defineComponent({
         scrollTimer = now;
       }
     };
-
     /* onMounted(function () {
       // useGlobalEvent.addEvent('window', resizeEventName, resizeEvent);
       // useGlobalEvent.addEvent('window', 'scroll', scrollEvent);

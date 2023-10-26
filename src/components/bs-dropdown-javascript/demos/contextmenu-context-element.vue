@@ -39,7 +39,7 @@ description:
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onBeforeMount } from 'vue';
 import easyestDropdown from '../easyest-dropdown';
 import '../../bs-dropdown-transition/easy-dropdown-transition.scss';
 
@@ -55,31 +55,37 @@ const hideDropdown = function () {
   }
 };
 
+const contextMenuEventFunc = function (evt: MouseEvent) {
+  evt.preventDefault();
+  let dropdownEl = document.getElementById('dropdownRef2')!;
+
+  let elPosition = easyestDropdown.getContextmenuDirection({
+    clientX: evt.clientX,
+    clientY: evt.clientY,
+    contextElement: document.getElementById('demoRef2')!
+  }, dropdownEl, placement.value, true);
+  console.log('elPosition', elPosition);
+
+  if (!isShow) {
+    dropdownEl.style.display = 'block';
+    isShow = true;
+  }
+
+  dropdownEl.style.left = elPosition.right == null ? (elPosition.left + 'px') : 'auto';
+  dropdownEl.style.right = elPosition.right != null ? (elPosition.right + 'px') : '';
+  dropdownEl.style.top = elPosition.bottom == null ? (elPosition.top + 'px') : 'auto';
+  dropdownEl.style.bottom = elPosition.bottom != null ? (elPosition.bottom + 'px') : '';
+
+  // dropdownEl.style.left = elPosition.left + 'px';
+  // dropdownEl.style.top = elPosition.top + 'px';
+};
+
 onMounted(function () {
-  document.documentElement.addEventListener('contextmenu', function (evt: MouseEvent) {
-    evt.preventDefault();
-    let dropdownEl = document.getElementById('dropdownRef2')!;
+  document.documentElement.addEventListener('contextmenu', contextMenuEventFunc, false);
+});
 
-    let elPosition = easyestDropdown.getContextmenuDirection({
-      clientX: evt.clientX,
-      clientY: evt.clientY,
-      contextElement: document.getElementById('demoRef2')!
-    }, dropdownEl, placement.value, true);
-    console.log('elPosition', elPosition);
-
-    if (!isShow) {
-      dropdownEl.style.display = 'block';
-      isShow = true;
-    }
-
-    dropdownEl.style.left = elPosition.right == null ? (elPosition.left + 'px') : 'auto';
-    dropdownEl.style.right = elPosition.right != null ? (elPosition.right + 'px') : '';
-    dropdownEl.style.top = elPosition.bottom == null ? (elPosition.top + 'px') : 'auto';
-    dropdownEl.style.bottom = elPosition.bottom != null ? (elPosition.bottom + 'px') : '';
-
-    // dropdownEl.style.left = elPosition.left + 'px';
-    // dropdownEl.style.top = elPosition.top + 'px';
-  }, false);
+onBeforeMount(function () {
+  document.documentElement.removeEventListener('contextmenu', contextMenuEventFunc, false);
 });
 </script>
 

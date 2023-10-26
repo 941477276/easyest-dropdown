@@ -31,7 +31,7 @@ export interface VirtualMouseEvent {
   clientX: number;
   clientY: number;
   target?: EventTarget|null;
-  contextElement?: HTMLElement; // 上下文元素
+  contextElement?: HTMLElement|null; // 上下文元素
 }
 
 export const endReg = /(\w+)End$/;

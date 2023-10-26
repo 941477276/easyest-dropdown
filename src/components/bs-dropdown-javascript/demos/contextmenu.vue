@@ -6,8 +6,8 @@ title:
   zh-CN: 右键菜单
   en-US: Context Menu
 description:
-  zh-CN: `easy-dropdown-transition`同样可以用来实现右键菜单功能，只需要设置`context-menu=true`即可
-  en-US: `easy-dropdown-transition` can also be used to implement the right-click menu function, just set `context-menu=true`
+  zh-CN: 调用`easyDropdown.getContextmenuDirection`函数即可获取右键菜单即将显示的位置及宽高信息
+  en-US: Call `easyDropdown.getContextmenuDirection` function to get the position and width and height information of the contextmenu(right-menu) menu to be displayed
 ---
 </docs>
 
@@ -39,7 +39,7 @@ description:
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onBeforeMount } from 'vue';
 import easyestDropdown from '../easyest-dropdown';
 import '../../bs-dropdown-transition/easy-dropdown-transition.scss';
 
@@ -55,30 +55,36 @@ const hideDropdown = function () {
   }
 };
 
+const contextMenuEventFunc = function (evt: MouseEvent) {
+  evt.preventDefault();
+  let dropdownEl = document.getElementById('dropdownRef1')!;
+
+  let elPosition = easyestDropdown.getContextmenuDirection({
+    clientX: evt.clientX,
+    clientY: evt.clientY
+  }, dropdownEl, placement.value, true);
+  console.log('elPosition', elPosition);
+
+  if (!isShow) {
+    dropdownEl.style.display = 'block';
+    isShow = true;
+  }
+
+  dropdownEl.style.left = elPosition.right == null ? (elPosition.left + 'px') : 'auto';
+  dropdownEl.style.right = elPosition.right != null ? (elPosition.right + 'px') : '';
+  dropdownEl.style.top = elPosition.bottom == null ? (elPosition.top + 'px') : 'auto';
+  dropdownEl.style.bottom = elPosition.bottom != null ? (elPosition.bottom + 'px') : '';
+
+  // dropdownEl.style.left = elPosition.left + 'px';
+  // dropdownEl.style.top = elPosition.top + 'px';
+};
+
 onMounted(function () {
-  document.documentElement.addEventListener('contextmenu', function (evt: MouseEvent) {
-    evt.preventDefault();
-    let dropdownEl = document.getElementById('dropdownRef1')!;
+  document.documentElement.addEventListener('contextmenu', contextMenuEventFunc, false);
+});
 
-    let elPosition = easyestDropdown.getContextmenuDirection({
-      clientX: evt.clientX,
-      clientY: evt.clientY
-    }, dropdownEl, placement.value, true);
-    console.log('elPosition', elPosition);
-
-    if (!isShow) {
-      dropdownEl.style.display = 'block';
-      isShow = true;
-    }
-
-    dropdownEl.style.left = elPosition.right == null ? (elPosition.left + 'px') : 'auto';
-    dropdownEl.style.right = elPosition.right != null ? (elPosition.right + 'px') : '';
-    dropdownEl.style.top = elPosition.bottom == null ? (elPosition.top + 'px') : 'auto';
-    dropdownEl.style.bottom = elPosition.bottom != null ? (elPosition.bottom + 'px') : '';
-
-    // dropdownEl.style.left = elPosition.left + 'px';
-    // dropdownEl.style.top = elPosition.top + 'px';
-  }, false);
+onBeforeMount(function () {
+  document.documentElement.removeEventListener('contextmenu', contextMenuEventFunc, false);
 });
 </script>
 
