@@ -14,7 +14,16 @@ import {
   checkTerminal
 } from '../../utils/bs-util';
 
-export interface DropdownOffset {
+import {
+  DropdownOffset,
+  DropdownDirection,
+  endReg,
+  centerReg,
+  documentNodeNames,
+  eleIsInView
+} from './dropdownDirectionHookCommon';
+
+/* export interface DropdownOffset {
   top?: number;
   left?: number;
   // bottom?: number;
@@ -34,7 +43,7 @@ export interface DropdownDirection {
   vertical: boolean;
   verticalVisibleHeight: number;
   isRollback?: boolean; // 是否为回滚到了默认方向
-};
+}; */
 
 export interface VirtualMouseEvent {
   clientX: number;
@@ -52,9 +61,9 @@ export interface VirtualMouseEvent {
  * @param tryEndDirection 是否尝试切换当前方向的尾部方向
  * @param dropdownOffset 下拉菜单距参照元素的偏移量
  */
-const endReg = /(\w+)End$/;
+/* const endReg = /(\w+)End$/;
 const centerReg = /(\w+)Center$/;
-const documentNodeNames = ['HTML', 'BODY'];
+const documentNodeNames = ['HTML', 'BODY']; */
 export function useContextmenuDropdownDirection (virtualMouseEvt: VirtualMouseEvent, targetEl: HTMLElement, direction: string, tryAllDirection = false, tryEndDirection = true, dropdownOffset?: DropdownOffset): DropdownDirection {
   if (!virtualMouseEvt || !targetEl || !direction) {
     throw new Error('One of the parameters of virtualMouseEvt, targetEl, direction is missing!');
@@ -516,7 +525,7 @@ export function useContextmenuDropdownDirection (virtualMouseEvt: VirtualMouseEv
  * @param {object} options
  * @returns {{horizontal: boolean, vertical: boolean}}
  */
-function eleIsInView (options: any) {
+/* function eleIsInView (options: any) {
   let {
     ele,
     top,
@@ -623,4 +632,4 @@ function eleIsInView (options: any) {
     vertical: verticalFullVisible,
     horizontal: horizontalFullVisible
   };
-}
+} */
