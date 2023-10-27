@@ -21,6 +21,12 @@ description:
         <bs-radio value="bottom-end">bottom-end</bs-radio>
       </bs-radio-group>
     </bs-form-item>
+    <bs-form-item label="Use zoom transition">
+      <bs-radio-group v-model="useZoomTransition">
+        <bs-radio :value="true">Yes</bs-radio>
+        <bs-radio :value="false">No</bs-radio>
+      </bs-radio-group>
+    </bs-form-item>
     <div class="context-menu-demo">
       <bs-button type="primary" @click="allowTeleport = !allowTeleport">Dropdown content teleport to body</bs-button>
       <bs-button type="primary" @click="show = false">Hide Dropdown</bs-button>
@@ -28,6 +34,7 @@ description:
       <teleport :disabled="!allowTeleport" to="body">
         <EasyestDropdownTransition
           context-menu
+          :use-zoom-transition="useZoomTransition"
           :placement="placement"
           :will-visible="willVisible"
           :virtual-mouse-event="virtualMouseEvent">
@@ -51,6 +58,7 @@ import '../easy-dropdown-transition.scss';
 
 let allowTeleport = ref(false);
 let placement = ref('top');
+let useZoomTransition = ref(false);
 let willVisible = ref(false);
 let show = ref(false);
 let referenceRef = ref();

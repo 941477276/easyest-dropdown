@@ -10,7 +10,7 @@
     @after-leave="onLeave"
     class="easyest-dropdown-transition"
     :class="[
-      `easyest-placement-${camelCase2KebabCase(dropdownStyle.direction)}`,
+      dynamicClassname,
       {
         'use-bottom-position': dropdownStyle.bottom != null,
         'use-right-position': dropdownStyle.right != null
@@ -58,6 +58,29 @@ import { useGlobalEvent } from '../../hooks/useGlobalEvent';
 import { PlainObject } from '../types';
 import { bsDropdownTransitionProps, BsDropdownPositionInfo } from './bs-dropdown-transition-types';
 
+const documentNodeNames = ['HTML', 'BODY'];
+const zoomTransitionOrigin: PlainObject = {
+  top: '0 100%',
+  topEnd: '100% 100%',
+  topCenter: '0 50%',
+  bottom: '0 0',
+  bottomEnd: '100% 0',
+  bottomCenter: '0 50%',
+  left: '100% 0',
+  leftEnd: '100% 100%',
+  leftCenter: 'right center',
+  right: '0 0',
+  rightEnd: '0 100%',
+  rightCenter: '0 center'
+};
+const transitionNameMap = {
+  zoom: 'easyest-zoom',
+  slideUp: 'easyest-slide-up',
+  slideDown: 'easyest-slide-down'
+};
+const slideUpTransitionPlacements = ['top', 'topCenter', 'topEnd'];
+const slideDownTransitionPlacements = ['bottom', 'bottomCenter', 'bottomEnd'];
+
 export default defineComponent({
   name: 'EasyestDropdownTransition',
   props: bsDropdownTransitionProps,
@@ -80,19 +103,6 @@ export default defineComponent({
     let referenceScrollParent: HTMLElement|undefined;
     let isVisible = ref(false);
     let targetRef = ref<HTMLElement|null>(null);
-    let documentNodeNames = ['HTML', 'BODY'];
-    let zoomTransitionOrigin: PlainObject = {
-      top: '0 100%',
-      topEnd: '100% 100%',
-      bottom: '0 0',
-      bottomEnd: '100% 0',
-      left: '100% 0',
-      leftEnd: '100% 100%',
-      leftCenter: 'right center',
-      right: '0 0',
-      rightEnd: '0 100%',
-      rightCenter: '0 center'
-    };
     // 外部自定义样式
     let styleCustom = ref<PlainObject>({});
 
@@ -129,7 +139,7 @@ export default defineComponent({
       let direction = displayDirection.direction;
       calcTransitionName(displayDirection);
 
-      if (transitionName.value == 'easyest-zoom') {
+      if (transitionName.value == transitionNameMap.zoom) {
         let origin = zoomTransitionOrigin[direction];
         transitionOrigin.value = {
           'transform-origin': origin,
@@ -175,26 +185,28 @@ export default defineComponent({
     let calcTransitionName = function (displayDirection: any) {
       let direction = displayDirection.direction;
       let customTransitionName = props.customTransitionName;
+      if (props.useZoomTransition) {
+        transitionName.value = transitionNameMap.zoom;
+        return;
+      }
       if (!isFunction(customTransitionName)) {
         if (slideUpTransitionPlacements.includes(direction)) {
-          transitionName.value = 'easyest-slide-up';
+          transitionName.value = transitionNameMap.slideUp;
         } else if (slideDownTransitionPlacements.includes(direction)) {
-          transitionName.value = 'easyest-slide-down';
+          transitionName.value = transitionNameMap.slideDown;
         } else {
-          transitionName.value = 'easyest-zoom';
+          transitionName.value = transitionNameMap.zoom;
         }
       } else {
         transitionName.value = customTransitionName(displayDirection);
       }
     };
 
-    let slideUpTransitionPlacements = ['top', 'topCenter', 'topEnd'];
-    let slideDownTransitionPlacements = ['bottom', 'bottomCenter', 'bottomEnd'];
     let transitionOrigin = ref<any>({});
     // 监听willVisible，在下拉菜单显示出来前计算出下拉菜单显示位置，如过useZoomTransition为true可以略过
     watch(() => props.willVisible, function (isVisible) {
       if (props.useZoomTransition) {
-        transitionName.value = 'easyest-zoom';
+        transitionName.value = transitionNameMap.zoom;
         return;
       }
       if (!isVisible) {
@@ -226,7 +238,8 @@ export default defineComponent({
     });
 
     watch(() => props.virtualMouseEvent, function () {
-      if (!props.contextMenu) {
+      // isVisible为false的时候不允许刷新，否则会与onEnter事件同时执行，导致第二次显示时丢失过渡效果
+      if (!props.contextMenu || !isVisible.value) {
         return;
       }
       refresh();
@@ -350,6 +363,14 @@ export default defineComponent({
       // useGlobalEvent.addEvent('window', 'scroll', scrollEvent);
     }); */
 
+    let dynamicClassname = computed(function () {
+      let direction = dropdownStyle.direction;
+      if (!props.contextMenu) {
+        return `easyest-placement-${camelCase2KebabCase(direction)}`;
+      }
+      return `easyest-contextmenu-placement-${camelCase2KebabCase(direction)}`;
+    });
+
     onBeforeMount(function () {
       // 防止下拉菜单为隐藏，组件就被销毁了
       useGlobalEvent.removeEvent('window', resizeEventName, resizeEvent);
@@ -366,6 +387,7 @@ export default defineComponent({
       targetRef,
       styleCustom,
       isVisible,
+      dynamicClassname,
 
       onEnter,
       onLeave,
