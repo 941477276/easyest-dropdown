@@ -1,6 +1,6 @@
 # easyest-dropdown
 
-`easyest-dropdown` is the most basic drop-down component that can be positioned intelligently. You can use it to implement any component with drop-down functions, such as custom select, date and time selector, multi-level menu, auto-fill input box, etc.
+`easyest-dropdown` is the most basic drop-down component that can be positioned intelligently. You can use it to implement any component with drop-down functions, such as custom select, date and time selector, multi-level menu, auto-fill input box, right-menu(contextmenu), etc.
 
 The intelligent positioning of `easyest-dropdown` is reflected in:
 1. When the drop-down pop-up window cannot be fully displayed in the browser viewport or the visible area of the scrolling container, it will be automatically adjusted to the best display position.
