@@ -5,6 +5,9 @@
   <AutoPlacement></AutoPlacement>
   <InDialog></InDialog>
   <CustomTransition></CustomTransition>
+  <Contextmenu></Contextmenu>
+  <ContextmenuContextElement></ContextmenuContextElement>
+  <ContextmenuInDialog></ContextmenuInDialog>
 </div>
 </template>
 
@@ -15,6 +18,9 @@ import CustomTransition from './custom-transition.vue';
 import Align from './aligns.vue';
 import AutoPlacement from './auto-placement.vue';
 import InDialog from './in-dialog.vue';
+import Contextmenu from './contextmenu.vue';
+import ContextmenuContextElement from './contextmenu-context-element.vue';
+import ContextmenuInDialog from './contextmenu-in-dialog.vue';
 
 export default defineComponent({
   name: 'DemoIndex',
@@ -23,7 +29,10 @@ export default defineComponent({
     CustomTransition,
     Align,
     AutoPlacement,
-    InDialog
+    InDialog,
+    Contextmenu,
+    ContextmenuContextElement,
+    ContextmenuInDialog
   }
 });
 </script>

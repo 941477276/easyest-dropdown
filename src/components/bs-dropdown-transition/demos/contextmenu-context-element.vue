@@ -3,11 +3,11 @@
 ---
 order: 0
 title:
-zh-CN: 右键菜单—上下文元素
-en-US: Context Menu--context element
+  zh-CN: 右键菜单—上下文元素
+  en-US: Contextmenu(context element)
 description:
-zh-CN: 设置`contextElement`参数后下拉菜单将以该元素为承载容器，下拉菜单的位置始终不会超出该元素
-en-US: After setting the `contextElement` parameter, the drop-down menu will use this element as the hosting container, and the position of the drop-down menu will never exceed this element.
+  zh-CN: 设置`contextElement`参数后下拉菜单将以该元素为承载容器，下拉菜单的位置始终不会超出该元素
+  en-US: After setting the `contextElement` parameter, the drop-down menu will use this element as the hosting container, and the position of the drop-down menu will never exceed this element.
 ---
 </docs>
 
@@ -52,7 +52,7 @@ en-US: After setting the `contextElement` parameter, the drop-down menu will use
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive, onBeforeUnmount } from 'vue';
 import EasyestDropdownTransition from '../BsDropdownTransition.vue';
 import '../easy-dropdown-transition.scss';
 
@@ -83,14 +83,20 @@ let showDropdown = function () {
   }
 };
 
+const contextmenuEvt = function (evt: MouseEvent) {
+  evt.preventDefault();
+  virtualMouseEvent.clientX = evt.clientX;
+  virtualMouseEvent.clientY = evt.clientY;
+  virtualMouseEvent.contextElement = demoRef.value;
+  showDropdown();
+};
+
 onMounted(function () {
-  document.documentElement.addEventListener('contextmenu', function (evt: MouseEvent) {
-    evt.preventDefault();
-    virtualMouseEvent.clientX = evt.clientX;
-    virtualMouseEvent.clientY = evt.clientY;
-    virtualMouseEvent.contextElement = demoRef.value;
-    showDropdown();
-  }, false);
+  document.documentElement.addEventListener('contextmenu', contextmenuEvt, false);
+});
+
+onBeforeUnmount(function () {
+  document.documentElement.removeEventListener('contextmenu', contextmenuEvt, false);
 });
 </script>
 

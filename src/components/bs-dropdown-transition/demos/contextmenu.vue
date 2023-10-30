@@ -52,7 +52,7 @@ description:
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive, onBeforeMount, onBeforeUnmount } from 'vue';
 import EasyestDropdownTransition from '../BsDropdownTransition.vue';
 import '../easy-dropdown-transition.scss';
 
@@ -82,13 +82,19 @@ let showDropdown = function () {
   }
 };
 
+const contextmenuEvt = function (evt: MouseEvent) {
+  evt.preventDefault();
+  virtualMouseEvent.clientX = evt.clientX;
+  virtualMouseEvent.clientY = evt.clientY;
+  showDropdown();
+};
+
 onMounted(function () {
-  document.documentElement.addEventListener('contextmenu', function (evt: MouseEvent) {
-    evt.preventDefault();
-    virtualMouseEvent.clientX = evt.clientX;
-    virtualMouseEvent.clientY = evt.clientY;
-    showDropdown();
-  }, false);
+  document.documentElement.addEventListener('contextmenu', contextmenuEvt, false);
+});
+
+onBeforeUnmount(function () {
+  document.documentElement.removeEventListener('contextmenu', contextmenuEvt, false);
 });
 </script>
 

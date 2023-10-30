@@ -87,7 +87,7 @@ export function getContextmenuDropdownDirection (virtualMouseEvt: VirtualMouseEv
   };
   var clientX = virtualMouseEvt.clientX;
   var clientY = virtualMouseEvt.clientY;
-  console.log('clientX,clientY', clientX, clientY);
+  console.log('clientX,clientY', clientX, clientY, direction);
 
   var contextElement = virtualMouseEvt.contextElement;
   var hasContextElement = !!contextElement && contextElement.nodeType == 1 && !documentNodeNames.includes(contextElement.nodeName);
@@ -109,12 +109,13 @@ export function getContextmenuDropdownDirection (virtualMouseEvt: VirtualMouseEv
     targetEl.style.opacity = '0';
     targetEl.style.display = 'block';
   }
-  var needSubtractScrollOffset = true; // 判断元素是否处于滚动容器视口时是否需要减去浏览器滚动条滚动的距离
+  var needSubtractScrollOffset = targetIsInFixedPosition ? false : true; // 判断元素是否处于滚动容器视口时是否需要减去浏览器滚动条滚动的距离
   let targetElOffsetParent = (targetEl.offsetParent || document.body) as HTMLElement;
 
   // 判断目标元素的position不为static的父级元素是否为body
   let targetElOffsetParentIsDocument = !targetElOffsetParent || (documentNodeNames.includes(targetElOffsetParent.nodeName));
   let targetElOffsetParentOffset = { top: 0, left: 0 };
+  let targetElOffsetParentRect = targetElOffsetParent.getBoundingClientRect();
   let targetElOffsetParentScrollInfo = { left: 0, top: 0 };
   if (!targetElOffsetParentIsDocument) {
     targetElOffsetParentOffset = offset(targetElOffsetParent);
@@ -169,9 +170,11 @@ export function getContextmenuDropdownDirection (virtualMouseEvt: VirtualMouseEv
     var bottom = null;
     var right = null;
 
-    // 加上滚动条滚动的距离
-    top += scrollInfo.top;
-    left += scrollInfo.left;
+    if (!targetIsInFixedPosition) {
+      // 加上滚动条滚动的距离
+      top += scrollInfo.top;
+      left += scrollInfo.left;
+    }
 
     if (hasContextElement) {
       if (targetIsInBody) {
@@ -215,6 +218,17 @@ export function getContextmenuDropdownDirection (virtualMouseEvt: VirtualMouseEv
     // top -= targetIsInBody ? referenceElWrapperScrollTop : 0;
     // left -= targetIsInBody ? referenceElWrapperScrollLeft : 0;
 
+    // 计算top值时需减去目标元素position不为static的父级元素的top值
+    let newTop = top; // - targetElOffsetParentOffset.top;
+    let newLeft = left; // - targetElOffsetParentOffset.left;
+    if (!targetIsInFixedPosition) {
+      newTop -= targetElOffsetParentOffset.top;
+      newLeft -= targetElOffsetParentOffset.left;
+    } else { // 当目标元素处于固定定位的容器中时，top、left值应减去targetElOffsetParent到浏览器可视视口顶端的距离，而不是整个文档最顶端的距离
+      newTop -= targetElOffsetParentRect.top;
+      newLeft -= targetElOffsetParentRect.left;
+    }
+
     if (targetIsInBody) {
       // 如果目标元素插入在body中，则bottom的值为浏览器可见高度减去参照元素至浏览器最顶端的距离，再加上参照元素滚动容器滚动滚动的距离即可
       // 实际为：浏览器可见高度-参照元素在可见高度内的位置-浏览器滚动条滚动的距离+参照元素滚动容器滚动滚动的距离
@@ -228,15 +242,13 @@ export function getContextmenuDropdownDirection (virtualMouseEvt: VirtualMouseEv
         right -= scrollInfo.left;
       }
     } else {
-      let newLeft = left - targetElOffsetParentOffset.left;
+      // let newLeft = left - targetElOffsetParentOffset.left;
       right = targetElOffsetParent.clientWidth - newLeft; // + referenceElWrapperScrollLeft;
     }
     if (right !== null && isBottomRight) {
       right -= targetElRect.width;
     }
-    // 计算top值时需减去目标元素position不为static的父级元素的top值
-    let newTop = top - targetElOffsetParentOffset.top;
-    let newLeft = left - targetElOffsetParentOffset.left;
+
     newTop -= dropdownOffsetTop;
     newLeft -= dropdownOffsetLeft;
     return {
@@ -251,7 +263,6 @@ export function getContextmenuDropdownDirection (virtualMouseEvt: VirtualMouseEv
   let handleTop = function (isTopRight: boolean, isCenter?: boolean) {
     var top = clientY - targetElRect.height;
     var left = clientX;
-    console.log('top,left111', top, left, isTopRight);
     if (isTopRight) {
       left -= targetElRect.width;
     }
@@ -259,10 +270,11 @@ export function getContextmenuDropdownDirection (virtualMouseEvt: VirtualMouseEv
       top += targetElRect.height / 2;
     }
 
-    console.log('top,left222', top, left);
-    // 加上浏览器滚动条滚动的距离
-    top += scrollInfo.top;
-    left += scrollInfo.left;
+    if (!targetIsInFixedPosition) {
+      // 加上浏览器滚动条滚动的距离
+      top += scrollInfo.top;
+      left += scrollInfo.left;
+    }
 
     if (hasContextElement) {
       if (targetIsInBody) {
@@ -286,9 +298,11 @@ export function getContextmenuDropdownDirection (virtualMouseEvt: VirtualMouseEv
     left += dropdownOffsetLeft;
 
     if (!targetIsInBody) {
-      // 减去目标元素所在position不等于static的父级元素距浏览器最左侧及最顶端的距离（包含浏览器滚动条滚动的距离）
-      top += targetElOffsetParentScrollInfo.top;
-      left += targetElOffsetParentScrollInfo.left;
+      if (!targetIsInFixedPosition) {
+        // 减去目标元素所在position不等于static的父级元素距浏览器最左侧及最顶端的距离（包含浏览器滚动条滚动的距离）
+        top += targetElOffsetParentScrollInfo.top;
+        left += targetElOffsetParentScrollInfo.left;
+      }
     }
 
     var isInView = eleIsInView({
@@ -311,6 +325,19 @@ export function getContextmenuDropdownDirection (virtualMouseEvt: VirtualMouseEv
     // var bottom = referenceOffset.top - targetElOffsetParentOffset.top - (targetElOffsetParentIsDocument ? referenceElWrapperScrollTop : 0) + referenceRect.height;
     var bottom = null;
     var right = null;
+
+    // 计算top值时需减去目标元素position不为static的父级元素的top值
+    let newTop = top; // - targetElOffsetParentOffset.top;
+    let newLeft = left; // - targetElOffsetParentOffset.left;
+
+    if (!targetIsInFixedPosition) {
+      newTop -= targetElOffsetParentOffset.top;
+      newLeft -= targetElOffsetParentOffset.left;
+    } else { // 当目标元素处于固定定位的容器中时，top、left值应减去targetElOffsetParent到浏览器可视视口顶端的距离，而不是整个文档最顶端的距离
+      newTop -= targetElOffsetParentRect.top;
+      newLeft -= targetElOffsetParentRect.left;
+    }
+
     if (targetIsInBody) {
       // top += targetElRect.height;
       // 如果目标元素插入在body中，则bottom的值为浏览器可见高度减去参照元素至浏览器最顶端的距离，再加上参照元素滚动容器滚动滚动的距离即可
@@ -331,8 +358,8 @@ export function getContextmenuDropdownDirection (virtualMouseEvt: VirtualMouseEv
         bottom -= scrollInfo.top;
       }
     } else {
-      let newTop = top - targetElOffsetParentOffset.top;
-      let newLeft = left - targetElOffsetParentOffset.left;
+      // let newTop = top - targetElOffsetParentOffset.top;
+      // let newLeft = left - targetElOffsetParentOffset.left;
       // 这里应该取 targetElOffsetParent.clientWidth，因为targetElOffsetParent可能会有垂直滚动条，offsetWidth会将垂直滚动条的宽度算进去
       bottom = targetElOffsetParent.clientHeight - newTop - targetElRect.height;// + referenceElWrapperScrollTop;
       right = targetElOffsetParent.clientWidth - newLeft; // + targetElRect.width; // + referenceElWrapperScrollLeft;
@@ -342,9 +369,6 @@ export function getContextmenuDropdownDirection (virtualMouseEvt: VirtualMouseEv
       right -= targetElRect.width;
     }
 
-    // 计算top值时需减去目标元素position不为static的父级元素的top值
-    let newTop = top - targetElOffsetParentOffset.top;
-    let newLeft = left - targetElOffsetParentOffset.left;
     newTop -= dropdownOffsetTop;
     newLeft -= dropdownOffsetLeft;
     return {
