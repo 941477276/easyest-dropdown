@@ -18,8 +18,8 @@
     ]"
     :style="{
       position: position,
-      ...(setWidth && contextMenu ? { width: dropdownStyle.width + 'px' } : {}),
-      ...(setMinWidth && contextMenu ? { minWidth: dropdownStyle.width + 'px' } : {}),
+      ...(setWidth && !contextMenu ? { width: dropdownStyle.width + 'px' } : {}),
+      ...(setMinWidth && !contextMenu ? { minWidth: dropdownStyle.width + 'px' } : {}),
       ...transitionOrigin,
       left: dropdownStyle.right == null ? (dropdownStyle.left + 'px') : 'auto',
       right: dropdownStyle.right != null ? (dropdownStyle.right + 'px') : '',

@@ -1,6 +1,6 @@
 {
   "name": "easyest-dropdown",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "`easyest-dropdown` is the most basic drop-down component for intelligent positioning, you can use it to implement any component with drop-down function, such as custom select, date and time selector, multi-level menu, auto-fill input box, etc.",
   "repository": {
     "type": "git",
