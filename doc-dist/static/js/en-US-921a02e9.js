@@ -30,13 +30,13 @@ const t="tool component",e="tool_component",n="DropdownTransition",d="drop down 
 <td>false</td>
 </tr>
 <tr>
-<td>tryEndDirection</td>
+<td>tryEndPlacement</td>
 <td>Whether to try the <code>end</code> direction of the <code>direction</code> direction when the drop-down menu cannot be fully displayed at the specified <code>direction</code> position</td>
 <td>boolean</td>
 <td>true</td>
 </tr>
 <tr>
-<td>tryAllDirection</td>
+<td>tryAllPlacement</td>
 <td>Whether to try to display in all directions when the dropdown menu cannot be fully displayed in the specified <code>direction</code></td>
 <td>boolean</td>
 <td>true</td>
@@ -81,6 +81,18 @@ const t="tool component",e="tool_component",n="DropdownTransition",d="drop down 
 <td>customStyle</td>
 <td>custom drop-down menu style</td>
 <td>(direction) =&gt; string</td>
+<td></td>
+</tr>
+<tr>
+<td>contextMenu</td>
+<td>Whether it is a right-click menu</td>
+<td>boolean</td>
+<td>false</td>
+</tr>
+<tr>
+<td>virtualMouseEvent</td>
+<td>Virtual mouse event object, only valid when contextMenu=true</td>
+<td><code>{ clientX: number; clientY: number; contextElement?: HTMLElement; // Context element }</code></td>
 <td></td>
 </tr>
 </tbody>

@@ -1,5 +1,5 @@
 const t="工具组件",n="tool_component",d="DropdownTransition",e="下拉过渡",o="dropdown-transition",r=`<p>智能自动定位的最基础的下拉组件，你可以用它实现任何带有下拉功能的组件.</p>
-`,a=`<h2 class="api-h2" id="API_h2">API</h2>
+`,c=`<h2 class="api-h2" id="API_h2">API</h2>
 <h3>DropdownTransition 属性</h3>
 <div class="table-responsive"><table class="api-table table table-hover">
 <thead class="thead-light">
@@ -30,13 +30,13 @@ const t="工具组件",n="tool_component",d="DropdownTransition",e="下拉过渡
 <td>false</td>
 </tr>
 <tr>
-<td>tryEndDirection</td>
+<td>tryEndPlacement</td>
 <td>当在指定的<code>direction</code>位置下拉菜单不能完全显示时，是否尝试<code>direction</code>方向的<code>end</code>方向</td>
 <td>boolean</td>
 <td>true</td>
 </tr>
 <tr>
-<td>tryAllDirection</td>
+<td>tryAllPlacement</td>
 <td>当在指定的<code>direction</code>位置下拉菜单不能完全显示时，是否尝试所有方向显示</td>
 <td>boolean</td>
 <td>true</td>
@@ -81,6 +81,18 @@ const t="工具组件",n="tool_component",d="DropdownTransition",e="下拉过渡
 <td>customStyle</td>
 <td>自定义下拉菜单style</td>
 <td>(direction) =&gt; string</td>
+<td></td>
+</tr>
+<tr>
+<td>contextMenu</td>
+<td>是否为右键菜单</td>
+<td>boolean</td>
+<td>false</td>
+</tr>
+<tr>
+<td>virtualMouseEvent</td>
+<td>虚拟鼠标事件对象，仅在 contextMenu=true 时有效</td>
+<td><code>{ clientX: number; clientY: number; contextElement?: HTMLElement; // 上下文元素 }</code></td>
 <td></td>
 </tr>
 </tbody>
@@ -149,4 +161,4 @@ const t="工具组件",n="tool_component",d="DropdownTransition",e="下拉过渡
 </tr>
 </tbody>
 </table></div>
-`,c={type:t,typeCode:n,title:d,subtitle:e,componentName:o,description:r,apiContent:a};export{a as apiContent,o as componentName,c as default,r as description,e as subtitle,d as title,t as type,n as typeCode};
+`,a={type:t,typeCode:n,title:d,subtitle:e,componentName:o,description:r,apiContent:c};export{c as apiContent,o as componentName,a as default,r as description,e as subtitle,d as title,t as type,n as typeCode};
