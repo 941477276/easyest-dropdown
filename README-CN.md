@@ -86,7 +86,7 @@ app.mount('#app');
 
 **方式二：局部注册**
 ```js
-import EasyestDropdownTransition from 'easyest-dropdown/es';
+import EasyestDropdownTransition from 'easyest-dropdown/vue3/es';
 import 'easyest-dropdown/vue3/es/easyest-dropdown.css';
 
 export default defineComponent({
