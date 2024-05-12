@@ -100,13 +100,18 @@ export function getDropdownDirection (referenceEl: HTMLElement, targetEl: HTMLEl
   if (!targetElOffsetParentIsDocument) {
     targetElOffsetParentOffset = offset(targetElOffsetParent);
   }
+  var bodyOverflowY = getStyle(document.body, 'overflow-y');
+  var bodyOverflowX = getStyle(document.body, 'overflow-x');
   // var targetElOpacity = tool.getStyle(targetEl, 'opacity');
   if (referenceIsInFixedPosition) {
-    var bodyOverflow = getStyle(document.body, 'overflow');
-    if (!targetElIsFixed && targetElOffsetParentIsDocument && bodyOverflow !== 'hidden') {
+    if (!targetElIsFixed && targetElOffsetParentIsDocument) {
       // 如果reference元素处于fixed定位的父级容器，并且目标元素处于body元素下且不是fixed定位，则需要加上浏览器滚动条滚动的距离
-      referenceOffset.top = referenceOffset.top + scrollTop();
-      referenceOffset.left = referenceOffset.left + scrollLeft();
+      if (bodyOverflowY != 'hidden') {
+        referenceOffset.top = referenceOffset.top + scrollTop();
+      }
+      if (bodyOverflowX != 'hidden') {
+        referenceOffset.left = referenceOffset.left + scrollLeft();
+      }
     }
     if (!targetElIsFixed && !targetElOffsetParentIsDocument) {
       needSubtractScrollOffset = true;
@@ -131,6 +136,7 @@ export function getDropdownDirection (referenceEl: HTMLElement, targetEl: HTMLEl
     vertical: false,
     horizontal: false
   }; */
+  console.log('targetIsInBody', targetIsInBody);
   let bodyHasScroll = hasScroll();
   let bodyScrollVisible = {
     vertical: false,
@@ -138,8 +144,8 @@ export function getDropdownDirection (referenceEl: HTMLElement, targetEl: HTMLEl
   };
   if (targetIsInBody) {
     bodyScrollVisible = {
-      vertical: getStyle(document.body, 'overflow-y') != 'hidden',
-      horizontal: getStyle(document.body, 'overflow-x') != 'hidden'
+      vertical: bodyOverflowY != 'hidden',
+      horizontal: bodyOverflowX != 'hidden'
     };
   }
   let bodyScrollWidth = scrollWidth();
