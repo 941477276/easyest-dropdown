@@ -15,7 +15,8 @@ description:
 <template>
   <div>
     <bs-button type="primary" @click="modalVisible = true" style="margin-right: 1rem;">Show Modal</bs-button>
-    <bs-button type="primary" @click="modalVisible2 = true">Show Modal2</bs-button>
+    <bs-button type="primary" @click="modalVisible2 = true" style="margin-right: 1rem;">Show Modal2</bs-button>
+    <bs-button type="primary" @click="modalVisible3 = true">Show Modal3</bs-button>
 
     <bs-modal class="modal1" title="A bts-vue modal" v-model:visible="modalVisible">
       <p>modal content!</p>
@@ -112,30 +113,100 @@ description:
         </easyest-dropdown-transition>
       </teleport>
     </bs-modal>
+
+    <!--<Modal v-model:visible="modalVisible3" title="antd modal">
+      <p>modal content!</p>
+      <p>modal content!</p>
+      <p>modal content!</p>
+      <p>modal content!</p>
+      <p>modal content!</p>
+      <p>modal content!</p>
+      <p>modal content!</p>
+      <p>modal content!</p>
+      <p>modal content!</p>
+      <p>modal content!</p>
+      <p>modal content!</p>
+      <Vue3CountryIntl v-model="countryCode" schema="input"></Vue3CountryIntl>
+      <p>modal content!</p>
+      <p>modal content!</p>
+      <bs-button ref="referenceRef3" type="primary" @click="showDropdown3" style="margin-left: 10rem;margin-right: 1rem;">{{ show3 ? 'Hide' : 'Show' }} custom dropdown</bs-button>
+      <bs-button type="primary" @click="allowTeleport3 = !allowTeleport3">Teleport to body</bs-button>
+      <p>modal content!</p>
+      <p>modal content!</p>
+      <p>modal content!</p>
+      <p>modal content!</p>
+      <p>modal content!</p>
+      <p>modal content!</p>
+      <p>modal content!</p>
+      <p>modal content!</p>
+      <p>modal content!</p>
+      <p>modal content!</p>
+      <p>modal content!</p>
+
+      <p>modal content!</p>
+      <p>modal content!</p>
+
+      <teleport :disabled="!allowTeleport3" to="body">
+        <easyest-dropdown-transition
+          :will-visible="willVisible3"
+          :reference-ref="referenceRef3"
+          :try-all-placement="false">
+          <ul
+            ref="dropdownRef3"
+            v-show="show3"
+            class="my-custom-dropdown">
+            <li>Html</li>
+            <li>Javascript</li>
+            <li>Css</li>
+            <li>Css</li>
+            <li>Css</li>
+            <li>Css</li>
+            <li>Css</li>
+            <li>Css</li>
+            <li>Css</li>
+            <li>Css</li>
+            <li>Css</li>
+            <li>Css</li>
+          </ul>
+        </easyest-dropdown-transition>
+      </teleport>
+    </Modal>-->
   </div>
 </template>
 
 <script setup>
 import { ref, reactive } from 'vue';
 import EasyestDropdownTransition from '../BsDropdownTransition.vue';
+// import { Modal } from 'ant-design-vue';
 import { useClickOutside } from '../../../hooks/useClickOutside';
 import '../easy-dropdown-transition.scss';
+import 'ant-design-vue/es/modal/style/index';
+// import Vue3CountryIntl from '../../vue3-country-intl';
 
 let modalVisible = ref(false);
 let modalVisible2 = ref(false);
+let modalVisible3 = ref(false);
 
 let willVisible = ref(false);
 let willVisible2 = ref(false);
+let willVisible3 = ref(false);
 
 let show = ref(false);
 let show2 = ref(false);
+let show3 = ref(false);
 let allowTeleport = ref(false);
 let allowTeleport2 = ref(false);
+let allowTeleport3 = ref(false);
 
 let referenceRef = ref();
 let referenceRef2 = ref();
+let referenceRef3 = ref();
 let dropdownRef = ref();
 let dropdownRef2 = ref();
+let dropdownRef3 = ref();
+
+let countryCode = ref('');
+
 let showDropdown = function () {
   // willVisible必须比show先行，这样才能确保<easy-dropdown-transition>组件正确的计算过渡动画名称
   willVisible.value = !willVisible.value;
@@ -154,6 +225,15 @@ let showDropdown2 = function () {
   }, 60);
 };
 
+let showDropdown3 = function () {
+  // willVisible必须比show先行，这样才能确保<easy-dropdown-transition>组件正确的计算过渡动画名称
+  willVisible3.value = !willVisible3.value;
+  let timer = setTimeout(function () {
+    clearTimeout(timer);
+    show3.value = !show3.value;
+  }, 60);
+};
+
 // 鼠标点击下拉菜单外面后立即隐藏下拉菜单
 useClickOutside([referenceRef, dropdownRef], function (isClickOutside) {
   console.log('isClickOutside', isClickOutside);
@@ -162,6 +242,7 @@ useClickOutside([referenceRef, dropdownRef], function (isClickOutside) {
     willVisible.value = false;
   }
 });
+
 </script>
 
 <style lang="scss" scoped>
